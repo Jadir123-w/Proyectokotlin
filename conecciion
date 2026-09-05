@@ -1,0 +1,1 @@
+    "DefaultConnection": "Host=aws-1-sa-east-1.pooler.supabase.com; Port=5432; Database=postgres; Username=postgres.gusklkadhrtbtthrbwqi; Password=Mamina1303032; SSL Mode=Require; Trust Server Certificate=true"
