@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo y superficies (MAUI: #000000, #1A1A1A, #111111) -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="surface_dark">#FF1A1A1A</color>
+    <color name="surface_card">#FF111111</color>
+    <color name="border_dark">#FF333333</color>
+    <color name="divider">#FF222222</color>
+
+    <!-- Rojos marca (MAUI: #B91C1C / #EF4444) -->
+    <color name="red_primary">#FFB91C1C</color>
+    <color name="red_accent">#FFEF4444</color>
+    <color name="red_light_text">#FFFFD1D1</color>
+
+    <!-- Grises texto -->
+    <color name="gray_muted">#FFA3A3A3</color>
+    <color name="gray_dark">#FF666666</color>
+    <color name="gray_small">#FF555555</color>
+    <color name="gray_detail">#FFD1D1D1</color>
+    <color name="gray_hint">#FF737373</color>
+
+    <!-- Estados dinero -->
+    <color name="green_money">#FF10B981</color>
+    <color name="blue_balance">#FF38BDF8</color>
+    <color name="gold_saving">#FFFFD700</color>
+</resources>

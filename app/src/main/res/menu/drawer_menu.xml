@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Equivale a los 4 FlyoutItem de AppShell.xaml -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_principal"
+            android:icon="@android:drawable/ic_menu_view"
+            android:title="Principal" />
+        <item
+            android:id="@+id/nav_historial"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Historial" />
+        <item
+            android:id="@+id/nav_ahorros"
+            android:icon="@android:drawable/ic_menu_save"
+            android:title="Ahorros" />
+        <item
+            android:id="@+id/nav_resumen"
+            android:icon="@android:drawable/ic_menu_month"
+            android:title="Resumen" />
+    </group>
+</menu>
