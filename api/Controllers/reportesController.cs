@@ -18,27 +18,39 @@ namespace MiApiSistema.Controllers
         [HttpGet("resumen-mensual")]
         public async Task<IActionResult> GetResumen()
         {
-            var fechaActual = DateTime.Now;
-            var movimientosMes = await _context.Movimientos
-                .Where(m => m.Fecha.Month == fechaActual.Month && m.Fecha.Year == fechaActual.Year)
+            var anioActual = DateTime.Now.Year;
+
+            // Traemos solo los movimientos del año actual y agrupamos por mes (Fecha.Month/Year)
+            var movimientosAnio = await _context.Movimientos
+                .Where(m => m.Fecha.Year == anioActual)
                 .ToListAsync();
 
-            var totalIngresos = movimientosMes.Where(m => m.EsIngreso).Sum(m => m.Monto);
-            var totalGastos = movimientosMes.Where(m => !m.EsIngreso).Sum(m => m.Monto);
-            var saldoActual = totalIngresos - totalGastos;
-
-            // También calculamos cuánto ha ahorrado
+            // Ahorro total es global (alcancía), se repite en cada mes como antes
             var totalAhorrado = await _context.Ahorros.SumAsync(a => a.MontoTotalAcumulado);
 
-            return Ok(new
+            // Nombres fijos en español para no depender de la cultura del servidor
+            // (antes ToString("MMMM") devolvía "September" y rompía el match en la app)
+            string[] meses = { "enero", "febrero", "marzo", "abril", "mayo", "junio",
+                               "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
+
+            var lista = Enumerable.Range(1, 12).Select(mes =>
             {
-                Mes = fechaActual.ToString("MMMM"),
-                Anio = fechaActual.Year,
-                Ingresos = totalIngresos,
-                Gastos = totalGastos,
-                SaldoDisponible = saldoActual,
-                AhorroTotalAcumulado = totalAhorrado
-            });
+                var delMes = movimientosAnio.Where(m => m.Fecha.Month == mes).ToList();
+                var ingresos = delMes.Where(m => m.EsIngreso).Sum(m => m.Monto);
+                var gastos = delMes.Where(m => !m.EsIngreso).Sum(m => m.Monto);
+
+                return new
+                {
+                    Mes = meses[mes - 1],
+                    Anio = anioActual,
+                    Ingresos = ingresos,
+                    Gastos = gastos,
+                    SaldoDisponible = ingresos - gastos,
+                    AhorroTotalAcumulado = totalAhorrado
+                };
+            }).ToList();
+
+            return Ok(lista);
         }
 
         [HttpGet("dashboard-principal")]

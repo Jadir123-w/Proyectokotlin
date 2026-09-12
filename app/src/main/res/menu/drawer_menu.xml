@@ -18,5 +18,9 @@
             android:id="@+id/nav_resumen"
             android:icon="@android:drawable/ic_menu_month"
             android:title="Resumen" />
+        <item
+            android:id="@+id/nav_presupuestos"
+            android:icon="@android:drawable/ic_menu_edit"
+            android:title="Presupuestos" />
     </group>
 </menu>

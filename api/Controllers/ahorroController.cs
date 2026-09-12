@@ -56,6 +56,44 @@ namespace MiApiSistema.Controllers
             });
         }
 
+        // PUT: api/Ahorro/5/retirar/50 (inverso de sumar: devuelve la plata a caja)
+        [HttpPut("{id}/retirar/{monto}")]
+        public async Task<IActionResult> RetirarAhorro(int id, decimal monto)
+        {
+            if (monto <= 0) return BadRequest("El monto debe ser mayor a cero.");
+
+            var ahorro = await _context.Ahorros.FindAsync(id);
+            if (ahorro == null) return NotFound();
+
+            if (ahorro.MontoTotalAcumulado < monto)
+                return BadRequest($"Saldo insuficiente. Disponible: {ahorro.MontoTotalAcumulado}");
+
+            // 1. Restamos de la alcancía
+            ahorro.MontoTotalAcumulado -= monto;
+            ahorro.UltimaActualizacion = DateTime.Now;
+
+            // 2. Creamos el movimiento inverso: EsIngreso=true para que SUME a caja
+            // (saldoEnCaja = ingresos - gastos). Con false se perdería doble.
+            var movimientoHistorial = new Movimiento
+            {
+                Descripcion = $"Retiro de: {ahorro.Descripcion}",
+                Monto = monto,
+                Fecha = DateTime.Now,
+                EsIngreso = true, // Entra a "efectivo" desde el ahorro
+                CategoriaId = 11, // Dorado en la app, tipo "Reserva de ahorro"
+                AhorroId = id
+            };
+
+            _context.Movimientos.Add(movimientoHistorial);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new {
+                Mensaje = $"Has retirado {monto} de {ahorro.Descripcion}.",
+                SaldoTotal = ahorro.MontoTotalAcumulado
+            });
+        }
+
         // POST: api/Ahorro
         [HttpPost]
         public async Task<ActionResult<Ahorro>> PostAhorro(Ahorro ahorro)

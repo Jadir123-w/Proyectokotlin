@@ -34,6 +34,7 @@ class PrincipalFragment : Fragment() {
     private lateinit var txtMonto: EditText
     private lateinit var spinner: Spinner
     private lateinit var lista: RecyclerView
+    private lateinit var txtVacio: TextView
     private var categorias: List<CategoriaDto> = emptyList()
     private var tieneDatos = false
 
@@ -47,12 +48,48 @@ class PrincipalFragment : Fragment() {
         txtMonto = v.findViewById(R.id.txtMonto)
         spinner = v.findViewById(R.id.spinnerCategoria)
         lista = v.findViewById(R.id.listaMovimientos)
+        txtVacio = v.findViewById(R.id.txtVacioMovimientos)
         lista.layoutManager = LinearLayoutManager(requireContext())
 
         v.findViewById<Button>(R.id.btnActualizar).setOnClickListener { cargarDatos() }
         v.findViewById<Button>(R.id.btnGuardar).setOnClickListener { guardarRegistro() }
+        v.findViewById<Button>(R.id.btnNuevaCategoria).setOnClickListener { pedirNuevaCategoria() }
+        v.findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.refreshPrincipal)
+            .setOnRefreshListener { cargarDatos() }
 
         cargarDatos()
+    }
+
+    // POST api/Categoria: crea categoría y recarga el spinner
+    private fun pedirNuevaCategoria() {
+        val input = EditText(requireContext()).apply { hint = "Nombre (ej. Mascota)" }
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Nueva categoría")
+            .setView(input)
+            .setPositiveButton("Crear") { _, _ ->
+                val nombre = input.text.toString().trim()
+                if (nombre.isEmpty()) {
+                    Toast.makeText(requireContext(), "Ponle un nombre", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val res = ApiClient.api.postCategoria(
+                            com.example.app_projecto.data.PostCategoriaRequest(nombre)
+                        )
+                        if (res.isSuccessful) {
+                            Toast.makeText(requireContext(), "Categoría creada", Toast.LENGTH_SHORT).show()
+                            cargarDatos()
+                        } else {
+                            Toast.makeText(requireContext(), "No se pudo crear", Toast.LENGTH_LONG).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     // Equivale a OnAppearing: recarga cada vez que se muestra
@@ -62,6 +99,8 @@ class PrincipalFragment : Fragment() {
     }
 
     private fun cargarDatos() {
+        val refresh = view?.findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.refreshPrincipal)
+        refresh?.isRefreshing = true
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // 1. Dashboard = Dinero Actual real (lifetime). Resumen-mensual solo da el mes
@@ -74,10 +113,14 @@ class PrincipalFragment : Fragment() {
                         lblAhorro.text = "S/ %.2f".format(it.totalAhorrado)
                     }
                 } else {
-                    // Fallback al mensual si dashboard falla (comportamiento MAUI original)
+                    // Fallback al mensual si dashboard falla: la API ahora devuelve los 12 meses,
+                    // tomamos el del mes actual del celular
                     val resResumen = ApiClient.api.getResumenMensual()
                     if (resResumen.isSuccessful) {
-                        resResumen.body()?.let {
+                        val lista = resResumen.body().orEmpty()
+                        val idx = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH)
+                        val actual = lista.getOrNull(idx) ?: lista.firstOrNull()
+                        actual?.let {
                             lblSaldo.text = "S/ %.2f".format(it.saldoDisponible)
                             lblAhorro.text = "S/ %.2f".format(it.ahorroTotalAcumulado)
                         }
@@ -90,27 +133,43 @@ class PrincipalFragment : Fragment() {
                     val dtos = resMov.body().orEmpty().sortedByDescending { it.id }.take(5)
                     lista.adapter = MovimientoAdapter(dtos.map { it.toVisual() })
                     if (dtos.isNotEmpty()) tieneDatos = true
+                    // Estado vacío hero
+                    txtVacio.visibility = if (dtos.isEmpty()) View.VISIBLE else View.GONE
+                    lista.visibility = if (dtos.isEmpty()) View.GONE else View.VISIBLE
                 }
 
                 // 3. Categorías filtrando Id != 11 (MainPage.xaml.cs:49)
                 val resCat = ApiClient.api.getCategorias()
                 if (resCat.isSuccessful) {
                     categorias = resCat.body().orEmpty().filter { it.id != 11 }
-                    spinner.adapter = ArrayAdapter(
+                    // Layout propio: cerrada en blanco sobre oscuro, desplegable en negro sobre blanco
+                    val spinAdapter = ArrayAdapter(
                         requireContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
+                        R.layout.spinner_selected,
                         categorias
                     )
+                    spinAdapter.setDropDownViewResource(R.layout.spinner_dropdown)
+                    spinner.adapter = spinAdapter
+                } else {
+                    Toast.makeText(requireContext(), "No se pudieron cargar categorías (error ${resCat.code()})", Toast.LENGTH_LONG).show()
                 }
+            } catch (e: java.net.UnknownHostException) {
+                txtVacio.text = "Sin conexión. Revisa que la API esté en ${ApiClient.BASE_URL}\nDesliza para reintentar 📡"
+                txtVacio.visibility = View.VISIBLE
+                Toast.makeText(requireContext(), "Sin conexión a la API. Verifica IP y puerto.", Toast.LENGTH_LONG).show()
+            } catch (e: java.net.SocketTimeoutException) {
+                Toast.makeText(requireContext(), "La API tardó mucho. Reintenta.", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 // Igual que MAUI: solo avisa si no hay datos visibles
                 if (!tieneDatos) {
                     Toast.makeText(
                         requireContext(),
-                        "Aviso: problema al sincronizar. Revisa que la API esté corriendo.",
+                        "Aviso: problema al sincronizar (${e.message}). Desliza para reintentar.",
                         Toast.LENGTH_LONG
                     ).show()
                 }
+            } finally {
+                refresh?.isRefreshing = false
             }
         }
     }
@@ -176,7 +235,12 @@ class PrincipalFragment : Fragment() {
             monto = monto,
             colorHex = color,
             categoria = nombreCat,
-            tipoTexto = tipo
+            tipoTexto = tipo,
+            id = id,
+            categoriaId = categoriaId,
+            esIngreso = esIngreso,
+            ahorroId = ahorroId,
+            fechaIso = fecha
         )
     }
 

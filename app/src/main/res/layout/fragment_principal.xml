@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/refreshPrincipal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/black">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:fillViewport="true">
 
     <LinearLayout
@@ -12,41 +17,33 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Card Saldo = Frame #B91C1C CornerRadius 20 (MainPage.xaml:31) -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Card Saldo HERO con degradado rojo -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/red_primary"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/red_accent"
-            app:strokeWidth="1dp">
+            android:background="@drawable/bg_hero_saldo"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:padding="25dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="25dp">
+                android:letterSpacing="0.15"
+                android:text="Dinero Actual (Aprox)"
+                android:textColor="@color/red_light_text"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.15"
-                    android:text="Dinero Actual (Aprox)"
-                    android:textColor="@color/red_light_text"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/lblSaldo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="S/ 0.00"
-                    android:textColor="@color/white"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/lblSaldo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S/ 0.00"
+                android:textColor="@color/white"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <!-- Card Ahorro = Frame #1A1A1A (MainPage.xaml:38) -->
         <com.google.android.material.card.MaterialCardView
@@ -141,13 +138,30 @@
             android:textColor="@color/white"
             android:textColorHint="#66FFFFFF" />
 
-        <Spinner
-            android:id="@+id/spinnerCategoria"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="@color/surface_dark"
-            android:padding="12dp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerCategoria"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/surface_dark"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/btnNuevaCategoria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:text="+"
+                android:textSize="20sp" />
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGuardar"
@@ -176,5 +190,19 @@
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="true" />
 
+        <!-- Estado vacío cuando no hay movimientos -->
+        <TextView
+            android:id="@+id/txtVacioMovimientos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="Sin movimientos todavía.\nToca ACTUALIZAR DATOS o registra el primero arriba 💸"
+            android:textColor="@color/gray_muted"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
     </LinearLayout>
 </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

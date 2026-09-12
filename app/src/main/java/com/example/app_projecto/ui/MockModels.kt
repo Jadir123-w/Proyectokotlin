@@ -4,18 +4,27 @@ package com.example.app_projecto.ui
 // En la fase 2 se reemplazarán por los DTOs reales de la API.
 data class MovimientoVisual(
     val descripcion: String,
-    val fecha: String,
+    val fecha: String, // ya formateada para mostrar (dd MMM o dd/MM/yyyy)
     val monto: Double,
     val colorHex: String = "#EF4444", // ColorMonto de MAUI
     val categoria: String = "General",
     val tipoTexto: String = "Gasto realizado",
-    var expandido: Boolean = false
+    var expandido: Boolean = false,
+    // Campos extra para Historial real (PUT/DELETE + filtro por CategoriaId)
+    // Réplica de MovimientoHistorial.cs: Id, CategoriaId, EsIngreso, AhorroId + fecha ISO original
+    val id: Int = 0,
+    val categoriaId: Int = 0,
+    val esIngreso: Boolean = false,
+    val ahorroId: Int? = null,
+    val fechaIso: String = ""
 )
 
 data class AhorroVisual(
     val descripcion: String,
-    val ultimaActualizacion: String,
-    val monto: Double
+    val ultimaActualizacion: String, // ya formateada "Última vez: dd/MM"
+    val monto: Double,
+    val id: Int = 0, // necesario para PUT api/Ahorro/{id}/sumar/{monto}
+    val fechaIso: String = ""
 )
 
 data class ResumenMesVisual(

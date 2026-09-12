@@ -52,18 +52,57 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Botón + circular (AhorrosPage.xaml:40) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSumar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:insetLeft="0dp"
-            android:insetRight="0dp"
-            android:text="+"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/red_primary"
-            app:cornerRadius="25dp"
-            android:textColor="@color/white" />
+        <!-- Botones + / - (sumar / retirar) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSumar"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:text="+"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/red_primary"
+                app:cornerRadius="26dp"
+                app:minWidth="0dp"
+                app:minHeight="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRetirar"
+                android:layout_width="52dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:text="-"
+                android:textColor="@color/black"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="19dp"
+                app:minWidth="0dp"
+                app:minHeight="0dp" />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

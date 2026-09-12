@@ -67,12 +67,35 @@ data class PostMovimientoRequest(
     val ahorroId: Int? = null
 )
 
+// Body del PUT api/Movimientos/{id} (MovimientoControllers.cs:99 + HistorialPage.xaml.cs:154)
+// Debe incluir Id igual al de la URL, resto de campos se reenvían igual
+data class PutMovimientoRequest(
+    val id: Int,
+    val descripcion: String,
+    val monto: Double,
+    val fecha: String, // reenviar la ISO original del GET
+    val esIngreso: Boolean,
+    val categoriaId: Int,
+    val ahorroId: Int? = null
+)
 // La API devuelve { Mensaje, Datos } en el POST
 data class PostMovimientoResponse(
     @SerializedName(value = "mensaje", alternate = ["Mensaje"])
     val mensaje: String? = null,
     @SerializedName(value = "datos", alternate = ["Datos"])
     val datos: MovimientoDto? = null
+)
+
+// Réplica de models/ahorro.cs + AhorrosPage.Ahorro (AhorrosPage.xaml.cs:65)
+data class AhorroDto(
+    @SerializedName(value = "id", alternate = ["Id"])
+    val id: Int = 0,
+    @SerializedName(value = "descripcion", alternate = ["Descripcion"])
+    val descripcion: String = "",
+    @SerializedName(value = "montoTotalAcumulado", alternate = ["MontoTotalAcumulado"])
+    val montoTotalAcumulado: Double = 0.0,
+    @SerializedName(value = "ultimaActualizacion", alternate = ["UltimaActualizacion"])
+    val ultimaActualizacion: String = ""
 )
 
 // Réplica de reportesController dashboard-principal (líneas 44-74)
@@ -88,6 +111,41 @@ data class DashboardPrincipalDto(
     val gastosDeEsteMes: Double = 0.0,
     @SerializedName(value = "ultimaActualizacion", alternate = ["UltimaActualizacion"])
     val ultimaActualizacion: String? = null
+)
+
+// POST api/Categoria (CategoriaController.cs:29)
+data class PostCategoriaRequest(
+    val nombre: String
+)
+
+// POST api/Ahorro (AhorroController.cs:60) -> crea ahorro + movimiento inicial CategoriaId=11
+data class PostAhorroRequest(
+    val descripcion: String,
+    val montoTotalAcumulado: Double,
+    val ultimaActualizacion: String // ISO-8601
+)
+
+// Réplica de models/presupuesto.cs + PresupuestoController (mes/anio + Categoria incluida)
+data class PresupuestoDto(
+    @SerializedName(value = "id", alternate = ["Id"])
+    val id: Int = 0,
+    @SerializedName(value = "montoLimite", alternate = ["MontoLimite"])
+    val montoLimite: Double = 0.0,
+    @SerializedName(value = "mes", alternate = ["Mes"])
+    val mes: Int = 0,
+    @SerializedName(value = "anio", alternate = ["Anio"])
+    val anio: Int = 0,
+    @SerializedName(value = "categoriaId", alternate = ["CategoriaId"])
+    val categoriaId: Int = 0,
+    @SerializedName(value = "categoria", alternate = ["Categoria"])
+    val categoria: CategoriaMovimientoDto? = null
+)
+
+data class PostPresupuestoRequest(
+    val montoLimite: Double,
+    val mes: Int,
+    val anio: Int,
+    val categoriaId: Int
 )
 
 // Lógica de colores idéntica a MovimientoHistorial.GetColorByCategoria (líneas 30-35)

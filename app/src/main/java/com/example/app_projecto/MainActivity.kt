@@ -6,6 +6,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.app_projecto.ui.AhorrosFragment
 import com.example.app_projecto.ui.HistorialFragment
+import com.example.app_projecto.ui.PresupuestosFragment
 import com.example.app_projecto.ui.PrincipalFragment
 import com.example.app_projecto.ui.ResumenFragment
 import com.google.android.material.appbar.MaterialToolbar
@@ -30,12 +31,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_historial -> HistorialFragment()
                 R.id.nav_ahorros -> AhorrosFragment()
                 R.id.nav_resumen -> ResumenFragment()
+                R.id.nav_presupuestos -> PresupuestosFragment()
                 else -> PrincipalFragment()
             }
             toolbar.title = when (item.itemId) {
                 R.id.nav_historial -> "HISTORIAL"
                 R.id.nav_ahorros -> "MIS AHORROS"
                 R.id.nav_resumen -> "HISTÓRICO MENSUAL"
+                R.id.nav_presupuestos -> "PRESUPUESTOS"
                 else -> "FINANZAS"
             }
             supportFragmentManager.beginTransaction()
